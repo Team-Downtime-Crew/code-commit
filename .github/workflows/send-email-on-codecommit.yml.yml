@@ -3,13 +3,13 @@ name: Send Commit Email
 on:
   push:
     branches:
-      - main  # or whichever branch you use
+      - main
 
 jobs:
   email_notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Send Email Notification
+      - name: Send Commit Notification Email
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -17,10 +17,9 @@ jobs:
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "📬 New Commit to ${{ github.repository }}"
-          to: saxenavardaan18@example.com   # replace with the email where you want the mail
+          to: saxenavardaan18@gmail.com
           from: GitHub Actions <${{ secrets.EMAIL_USERNAME }}>
-          content_type: text/html
-          body: |
+          html_body: |
             <h2>✅ New Commit Notification</h2>
             <p><strong>📁 Repository:</strong> ${{ github.repository }}</p>
             <p><strong>🌿 Branch:</strong> ${{ github.ref_name }}</p>
