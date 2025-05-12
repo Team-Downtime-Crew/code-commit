@@ -1,20 +1,39 @@
-name: Commit Logger
+name: Commit Notification
 
 on:
   push:
     branches:
-      - main  # Change this to your branch if needed
+      - main  # Change to your desired branch
 
 jobs:
-  log-commit:
+  notify:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Show commit info
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Generate formatted commit notification
         run: |
-          echo "🔔 New commit pushed!"
-          echo "🔹 Repository: ${{ github.repository }}"
-          echo "🔹 Branch: ${{ github.ref }}"
-          echo "🔹 Pusher: ${{ github.actor }}"
-          echo "🔹 Commit Message: ${{ github.event.head_commit.message }}"
-          echo "🔹 Commit Author: ${{ github.event.head_commit.author.name }}"
+          echo "====================================================="
+          echo "📦  Commit Notification - GitHub Actions"
+          echo "====================================================="
+          echo "🔁 Branch      : $(echo '${{ github.ref }}' | sed 's/refs\/heads\///')"
+          echo "🏠 Repo URL    : https://github.com/${{ github.repository }}"
+          echo "🔗 Commit      : ${{ github.sha }}"
+          echo "🔗 Commit URL  : https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+          echo "👤 Author      : ${{ github.event.head_commit.author.name }} <${{ github.event.head_commit.author.email }}>"
+          echo "📅 Date        : $(date -d '${{ github.event.head_commit.timestamp }}' '+%Y-%m-%d (%a, %d %b %Y)')"
+          echo ""
+          echo "📝 Commit Message:"
+          echo "-----------------------------------------------------"
+          echo "${{ github.event.head_commit.message }}"
+          echo "-----------------------------------------------------"
+          echo ""
+
+          echo "🗂️  Changed Files:"
+          echo "-----------------------------------------------------"
+          for file in ${{ join(github.event.head_commit.added, ' ') }}; do echo "🟢 Added: $file"; done
+          for file in ${{ join(github.event.head_commit.modified, ' ') }}; do echo "🟡 Modified: $file"; done
+          for file in ${{ join(github.event.head_commit.removed, ' ') }}; do echo "🔴 Removed: $file"; done
+          echo "====================================================="
