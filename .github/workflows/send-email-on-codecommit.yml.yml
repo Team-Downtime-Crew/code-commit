@@ -1,39 +1,29 @@
-name: Commit Notification
+name: Send Commit Email
 
 on:
   push:
     branches:
-      - main  # Change to your desired branch
+      - main  # or whichever branch you use
 
 jobs:
-  notify:
+  email_notify:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Generate formatted commit notification
-        run: |
-          echo "====================================================="
-          echo "📦  Commit Notification - GitHub Actions"
-          echo "====================================================="
-          echo "🔁 Branch      : $(echo '${{ github.ref }}' | sed 's/refs\/heads\///')"
-          echo "🏠 Repo URL    : https://github.com/${{ github.repository }}"
-          echo "🔗 Commit      : ${{ github.sha }}"
-          echo "🔗 Commit URL  : https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
-          echo "👤 Author      : ${{ github.event.head_commit.author.name }} <${{ github.event.head_commit.author.email }}>"
-          echo "📅 Date        : $(date -d '${{ github.event.head_commit.timestamp }}' '+%Y-%m-%d (%a, %d %b %Y)')"
-          echo ""
-          echo "📝 Commit Message:"
-          echo "-----------------------------------------------------"
-          echo "${{ github.event.head_commit.message }}"
-          echo "-----------------------------------------------------"
-          echo ""
-
-          echo "🗂️  Changed Files:"
-          echo "-----------------------------------------------------"
-          for file in ${{ join(github.event.head_commit.added, ' ') }}; do echo "🟢 Added: $file"; done
-          for file in ${{ join(github.event.head_commit.modified, ' ') }}; do echo "🟡 Modified: $file"; done
-          for file in ${{ join(github.event.head_commit.removed, ' ') }}; do echo "🔴 Removed: $file"; done
-          echo "====================================================="
+      - name: Send Email Notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "📬 New Commit to ${{ github.repository }}"
+          to: saxenavardaan18@example.com   # replace with the email where you want the mail
+          from: GitHub Actions <${{ secrets.EMAIL_USERNAME }}>
+          content_type: text/html
+          body: |
+            <h2>✅ New Commit Notification</h2>
+            <p><strong>📁 Repository:</strong> ${{ github.repository }}</p>
+            <p><strong>🌿 Branch:</strong> ${{ github.ref_name }}</p>
+            <p><strong>✍️ Author:</strong> ${{ github.event.head_commit.author.name }} &lt;${{ github.event.head_commit.author.email }}&gt;</p>
+            <p><strong>📝 Message:</strong> ${{ github.event.head_commit.message }}</p>
+            <p><a href="https://github.com/${{ github.repository }}/commit/${{ github.sha }}">🔗 View Commit on GitHub</a></p>
