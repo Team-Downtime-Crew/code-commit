@@ -7,7 +7,7 @@ on:
 
 jobs:
   email_notify:
-    
+    runs-on: ubuntu-latest
     steps:
       - name: Send Commit Notification Email
         uses: dawidd6/action-send-mail@v3
